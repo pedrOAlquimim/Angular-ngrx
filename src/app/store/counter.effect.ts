@@ -1,17 +1,16 @@
-import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { decrement, increment } from "./counter.actions";
-import { tap } from "rxjs/operators";
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
+import { Actions, ofType, createEffect } from '@ngrx/effects';
+import { tap } from 'rxjs/operators';
+import { CounterState } from './counter.reducer';
 
 @Injectable()
 export class CounterEffect {
-  constructor(private action$: Actions) {}
+  constructor(private action$: Actions, private counterState: CounterState) {}
 
   saveCount = createEffect(() => this.action$.pipe(
-    ofType(increment, decrement),
-    tap((action) => {
-      console.log(action)
-      localStorage.setItem('count', action.value.toString())
-    }),
-  ), {dispatch: false})
+    tap(action => {
+      console.log(action);
+      localStorage.setItem('count', this.counterState.counter.toString());
+    })
+  ), { dispatch: false });
 }

@@ -1,23 +1,34 @@
-import { Component } from '@angular/core';
-
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { decrement, increment } from '../store/counter.actions';
-
+import { CounterState } from '../store/counter.reducer';
+import { Manager } from '../store/manage';
 @Component({
   selector: 'app-counter-controls',
   templateUrl: './counter-controls.component.html',
   styleUrls: ['./counter-controls.component.css'],
 })
-export class CounterControlsComponent {
-  constructor(
-    private store: Store
-  ) {}
+export class CounterControlsComponent extends Manager<CounterState> {
+  counterState: CounterState;
 
-  increment() {
-    this.store.dispatch(increment({value: 5}))
+  constructor(
+  ) {
+    const initialCounterState = new CounterState();
+    super(initialCounterState);
+    this.counterState = initialCounterState;
+  }
+
+  async increment() {
+    const currentState = this.getCurrentState();
+    this.emit(currentState.copyWith({ counter: currentState.counter ++ }));
+    console.log(currentState);
   }
 
   decrement() {
-    this.store.dispatch(decrement({value: 3}))
+    const currentState = this.getCurrentState();
+    this.emit(currentState.copyWith({ counter: currentState.counter -- }));
+    console.log(currentState);
   }
 }
+
+var controller = new CounterControlsComponent();
+controller.getState

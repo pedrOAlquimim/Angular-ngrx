@@ -1,21 +1,29 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { selectCounter, selectDoubleCounter } from '../store/counter.selector';
+import { tap } from 'rxjs/operators';
+import { CounterState } from '../store/counter.reducer';
+import { Manager } from '../store/manage';
 
 @Component({
   selector: 'app-counter-output',
   templateUrl: './counter-output.component.html',
   styleUrls: ['./counter-output.component.css'],
 })
-export class CounterOutputComponent {
-  count$: Observable<number>
-  double$: Observable<number>
+export class CounterOutputComponent implements OnInit {
+  state$?: Observable<CounterState>;
 
   constructor(
-    private counterStore: Store<{ counter: number }>
-  ) {
-    this.count$ = this.counterStore.select(selectCounter)
-    this.double$ = this.counterStore.select(selectDoubleCounter)
+    @Inject(Manager) private counterStateManager: Manager<CounterState>,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.state$ = this.counterStateManager.getState().pipe(
+      tap((currentState) => currentState)
+    );
+
+    this.counterStateManager.getState().subscribe(() => {
+      this.cdr.detectChanges();
+    });
   }
 }
